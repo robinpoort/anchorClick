@@ -31,35 +31,51 @@
     var down;
     var up;
 
-    function handleCard(card) {
-      var link = card.querySelector('[' + linkAttr + ']');
+    function handleItem(item) {
+      var link = item.querySelector('[' + linkAttr + ']');
       if (link !== null) {
-        card.classList.add(clickableClass);
+        item.classList.add(clickableClass);
+      } else {
+        item.classList.remove(clickableClass);
       }
     }
 
-    document.querySelectorAll('[' + parentAttr + ']').forEach(function (card) {
-      handleCard(card);
+    document.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
+      handleItem(item);
     });
 
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
-        mutation.addedNodes.forEach(function (addedNode) {
-          if (addedNode && addedNode.nodeType === Node.ELEMENT_NODE) {
-            if (addedNode.hasAttribute(parentAttr)) {
-              handleCard(addedNode);
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(function (addedNode) {
+            if (addedNode && addedNode.nodeType === Node.ELEMENT_NODE) {
+              if (addedNode.hasAttribute(parentAttr)) {
+                handleItem(addedNode);
+              }
+              addedNode.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
+                handleItem(item);
+              });
             }
-            addedNode.querySelectorAll('[' + parentAttr + ']').forEach(function (card) {
-              handleCard(card);
-            });
+          });
+        } else if (mutation.type === 'attributes') {
+          var target = mutation.target;
+          if (mutation.attributeName === parentAttr) {
+            handleItem(target);
+          } else if (mutation.attributeName === linkAttr) {
+            var parent = target.closest('[' + parentAttr + ']');
+            if (parent) {
+              handleItem(parent);
+            }
           }
-        });
+        }
       });
     });
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
+      attributes: true,
+      attributeFilter: [parentAttr, linkAttr]
     });
 
     window.addEventListener('mousedown', function () {
@@ -72,23 +88,23 @@
       }
 
       up = Number(new Date());
-      var card = event.target.closest('[' + parentAttr + ']');
+      var item = event.target.closest('[' + parentAttr + ']');
       var ignore = event.target.closest('[' + ignoreAttr + '], [href]:not([' + linkAttr + '])');
 
-      if (!card) {
+      if (!item) {
         return;
       }
 
-      var cardValue = card.getAttribute(parentAttr);
-      var link = cardValue && cardValue.length > 0
-        ? card.querySelector('[' + linkAttr + '="' + cardValue + '"]')
-        : card.querySelector('[' + linkAttr + ']');
+      var itemValue = item.getAttribute(parentAttr);
+      var link = itemValue && itemValue.length > 0
+        ? item.querySelector('[' + linkAttr + '="' + itemValue + '"]')
+        : item.querySelector('[' + linkAttr + ']');
 
       if (!link) {
         return;
       }
 
-      if (up - down < downUpTime && !ignore) {
+      if (item && up - down < downUpTime && !ignore) {
         if ((event.ctrlKey && event.ctrlKey === true) || (event.which && event.which === 2)) {
           window.open(link);
         } else {

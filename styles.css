@@ -202,6 +202,11 @@ button {
   transition: background 0.15s;
 }
 
+.test-section button code {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
 button:hover {
   background: #16213e;
 }

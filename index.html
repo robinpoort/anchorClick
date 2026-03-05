@@ -128,6 +128,31 @@
     </section>
 
     <!-- ==============================
+         5. Attribute changes
+         ============================== -->
+    <section class="test-section">
+      <h2>Attribute changes</h2>
+      <p>Adding or removing <code>data-anchor-parent</code> or <code>data-anchor-click</code> on existing elements is detected automatically — no re-initialisation needed.</p>
+      <div class="item-grid">
+        <div class="item" id="attr-item">
+          <h3>This item has no attributes yet</h3>
+          <p>Use the buttons below to add and remove attributes dynamically.</p>
+          <div class="item-meta">
+            <a id="attr-link" href="#attr-target">The link</a>
+          </div>
+        </div>
+      </div>
+      <div class="button-row">
+        <button onclick="addParentAttr()">Add <code>data-anchor-parent</code></button>
+        <button onclick="removeParentAttr()">Remove <code>data-anchor-parent</code></button>
+      </div>
+      <div class="button-row">
+        <button onclick="addLinkAttr()">Add <code>data-anchor-click</code> to link</button>
+        <button onclick="removeLinkAttr()">Remove <code>data-anchor-click</code> from link</button>
+      </div>
+    </section>
+
+    <!-- ==============================
          Log
          ============================== -->
     <section class="test-section">
@@ -210,6 +235,34 @@
       document.getElementById('dynamic-items').innerHTML = '';
       itemCount = 0;
       log('Dynamic items cleared');
+    }
+
+    // ==============================
+    // Attribute changes
+    // ==============================
+
+    function addParentAttr() {
+      const item = document.getElementById('attr-item');
+      item.setAttribute('data-anchor-parent', '');
+      log('Added data-anchor-parent to #attr-item');
+    }
+
+    function removeParentAttr() {
+      const item = document.getElementById('attr-item');
+      item.removeAttribute('data-anchor-parent');
+      log('Removed data-anchor-parent from #attr-item');
+    }
+
+    function addLinkAttr() {
+      const link = document.getElementById('attr-link');
+      link.setAttribute('data-anchor-click', '');
+      log('Added data-anchor-click to #attr-link');
+    }
+
+    function removeLinkAttr() {
+      const link = document.getElementById('attr-link');
+      link.removeAttribute('data-anchor-click');
+      log('Removed data-anchor-click from #attr-link');
     }
 
     // ==============================

@@ -81,6 +81,7 @@ Buttons and anchor tags are always ignored automatically.
 - **Text selection** — clicking and dragging to select text does not trigger navigation (threshold: 200ms).
 - **Ctrl+click / middle-click** — opens the link in a new tab.
 - **Dynamic content** — items added to the DOM after page load are handled automatically via `MutationObserver`.
+- **Attribute changes** — adding or removing `data-anchor-parent` or `data-anchor-click` on existing elements is detected automatically. For example, adding `data-anchor-click` to a link inside an existing item will make that item clickable without re-initialising.
 
 ## License
 
