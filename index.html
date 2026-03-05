@@ -24,10 +24,10 @@
          ============================== -->
     <section class="test-section">
       <h2>Basic item</h2>
-      <p>The entire item is clickable via <code>data-anchor-parent</code> + <code>data-anchor-click</code>. Click anywhere on the item (not just the title link) to navigate.</p>
+      <p>The entire item is clickable via <code>data-anchor</code> + <code>data-anchor-target</code>. Click anywhere on the item (not just the title link) to navigate.</p>
       <div class="item-grid">
-        <div class="item" data-anchor-parent>
-          <h3><a href="#basic-1" data-anchor-click>Item title</a></h3>
+        <div class="item" data-anchor>
+          <h3><a href="#basic-1" data-anchor-target>Item title</a></h3>
           <p>Click anywhere on this item. It will navigate to the link in the heading.</p>
           <div class="item-meta">
             <span>Category</span>
@@ -35,18 +35,18 @@
             <span>5 min read</span>
           </div>
         </div>
-        <div class="item" data-anchor-parent>
-          <h3><a href="#basic-2" data-anchor-click>Another item</a></h3>
-          <p>This item also has a <code>data-anchor-click</code> and is fully clickable.</p>
+        <div class="item" data-anchor>
+          <h3><a href="#basic-2" data-anchor-target>Another item</a></h3>
+          <p>This item also has a <code>data-anchor-target</code> and is fully clickable.</p>
           <div class="item-meta">
             <span>Category</span>
             <span>·</span>
             <span>3 min read</span>
           </div>
         </div>
-        <div class="item item-no-link" data-anchor-parent>
+        <div class="item item-no-link" data-anchor>
           <h3>Item without link</h3>
-          <p>This item has <code>data-anchor-parent</code> but no <code>data-anchor-click</code>, so it does not become clickable.</p>
+          <p>This item has <code>data-anchor</code> but no <code>data-anchor-target</code>, so it does not become clickable.</p>
         </div>
       </div>
     </section>
@@ -58,10 +58,10 @@
          ============================== -->
     <section class="test-section">
       <h2>Named link</h2>
-      <p>When an item contains multiple links, use <code>data-anchor-parent="name"</code> and <code>data-anchor-click="name"</code> to designate the primary link. The other links remain independently clickable.</p>
+      <p>When an item contains multiple links, use <code>data-anchor="name"</code> and <code>data-anchor-target="name"</code> to designate the primary link. The other links remain independently clickable.</p>
       <div class="item-grid">
-        <div class="item item-named" data-anchor-parent="primary">
-          <h3><a href="#named-primary" data-anchor-click="primary">Primary link</a></h3>
+        <div class="item item-named" data-anchor="primary">
+          <h3><a href="#named-primary" data-anchor-target="primary">Primary link</a></h3>
           <p>Clicking the item background navigates to the primary link.</p>
           <div class="item-meta">
             <a href="#named-secondary">Secondary link</a>
@@ -69,11 +69,11 @@
             <a href="#named-tertiary">Tertiary link</a>
           </div>
         </div>
-        <div class="item item-named" data-anchor-parent="secondary">
+        <div class="item item-named" data-anchor="secondary">
           <h3><a href="#named-other">Other link</a></h3>
           <p>Here the <em>second</em> link is the primary target.</p>
           <div class="item-meta">
-            <a href="#named-secondary-target" data-anchor-click="secondary">This is the primary target</a>
+            <a href="#named-secondary-target" data-anchor-target="secondary">This is the primary target</a>
           </div>
         </div>
       </div>
@@ -88,22 +88,22 @@
       <h2>Ignored elements</h2>
       <p>Buttons and elements with <code>data-anchor-ignore</code> do not trigger navigation. Buttons and anchor tags are always ignored automatically.</p>
       <div class="item-grid">
-        <div class="item item-ignore" data-anchor-parent>
-          <h3><a href="#ignore-primary" data-anchor-click>Item title</a></h3>
+        <div class="item item-ignore" data-anchor>
+          <h3><a href="#ignore-primary" data-anchor-target>Item title</a></h3>
           <p>The button below does not trigger navigation.</p>
           <div class="item-meta">
             <button onclick="log('Button clicked (not item navigation)')">Action button</button>
           </div>
         </div>
-        <div class="item item-ignore" data-anchor-parent>
-          <h3><a href="#ignore-primary-2" data-anchor-click>Item title</a></h3>
+        <div class="item item-ignore" data-anchor>
+          <h3><a href="#ignore-primary-2" data-anchor-target>Item title</a></h3>
           <p>The element below has <code>data-anchor-ignore</code> and does not trigger navigation.</p>
           <div class="item-meta">
             <span data-anchor-ignore style="cursor: default; background: #fff3cd; padding: 0.2rem 0.5rem; border-radius: 3px;">Ignored area</span>
           </div>
         </div>
-        <div class="item item-ignore" data-anchor-parent>
-          <h3><a href="#ignore-primary-3" data-anchor-click>Item title</a></h3>
+        <div class="item item-ignore" data-anchor>
+          <h3><a href="#ignore-primary-3" data-anchor-target>Item title</a></h3>
           <p>A secondary anchor tag is always ignored automatically — it navigates independently.</p>
           <div class="item-meta">
             <a href="#ignore-secondary">Independent link</a>
@@ -132,7 +132,7 @@
          ============================== -->
     <section class="test-section">
       <h2>Attribute changes</h2>
-      <p>Adding or removing <code>data-anchor-parent</code> or <code>data-anchor-click</code> on existing elements is detected automatically — no re-initialisation needed.</p>
+      <p>Adding or removing <code>data-anchor</code> or <code>data-anchor-target</code> on existing elements is detected automatically — no re-initialisation needed.</p>
       <div class="item-grid">
         <div class="item" id="attr-item">
           <h3>This item has no attributes yet</h3>
@@ -143,12 +143,12 @@
         </div>
       </div>
       <div class="button-row">
-        <button onclick="addParentAttr()">Add <code>data-anchor-parent</code></button>
-        <button onclick="removeParentAttr()">Remove <code>data-anchor-parent</code></button>
+        <button onclick="addParentAttr()">Add <code>data-anchor</code></button>
+        <button onclick="removeParentAttr()">Remove <code>data-anchor</code></button>
       </div>
       <div class="button-row">
-        <button onclick="addLinkAttr()">Add <code>data-anchor-click</code> to link</button>
-        <button onclick="removeLinkAttr()">Remove <code>data-anchor-click</code> from link</button>
+        <button onclick="addLinkAttr()">Add <code>data-anchor-target</code> to link</button>
+        <button onclick="removeLinkAttr()">Remove <code>data-anchor-target</code> from link</button>
       </div>
     </section>
 
@@ -234,9 +234,9 @@
       const container = document.getElementById('dynamic-items');
       const item = document.createElement('div');
       item.className = 'item';
-      item.setAttribute('data-anchor-parent', '');
+      item.setAttribute('data-anchor', '');
       item.innerHTML = `
-        <h3><a href="#dynamic-${itemCount}" data-anchor-click>Dynamic item ${itemCount}</a></h3>
+        <h3><a href="#dynamic-${itemCount}" data-anchor-target>Dynamic item ${itemCount}</a></h3>
         <p>Added after page load. Should be immediately clickable.</p>
       `;
       container.appendChild(item);
@@ -277,26 +277,26 @@
 
     function addParentAttr() {
       const item = document.getElementById('attr-item');
-      item.setAttribute('data-anchor-parent', '');
-      log('Added data-anchor-parent to #attr-item');
+      item.setAttribute('data-anchor', '');
+      log('Added data-anchor to #attr-item');
     }
 
     function removeParentAttr() {
       const item = document.getElementById('attr-item');
-      item.removeAttribute('data-anchor-parent');
-      log('Removed data-anchor-parent from #attr-item');
+      item.removeAttribute('data-anchor');
+      log('Removed data-anchor from #attr-item');
     }
 
     function addLinkAttr() {
       const link = document.getElementById('attr-link');
-      link.setAttribute('data-anchor-click', '');
-      log('Added data-anchor-click to #attr-link');
+      link.setAttribute('data-anchor-target', '');
+      log('Added data-anchor-target to #attr-link');
     }
 
     function removeLinkAttr() {
       const link = document.getElementById('attr-link');
-      link.removeAttribute('data-anchor-click');
-      log('Removed data-anchor-click from #attr-link');
+      link.removeAttribute('data-anchor-target');
+      log('Removed data-anchor-target from #attr-link');
     }
 
     // ==============================
@@ -304,7 +304,7 @@
     // ==============================
 
     function updateBadges() {
-      document.querySelectorAll('[data-anchor-parent]').forEach((item) => {
+      document.querySelectorAll('[data-anchor]').forEach((item) => {
         let badge = item.querySelector('.badge');
         if (!badge) {
           badge = document.createElement('span');
@@ -317,7 +317,7 @@
       });
 
       document.querySelectorAll('.badge').forEach((badge) => {
-        if (!badge.closest('[data-anchor-parent]')) {
+        if (!badge.closest('[data-anchor]')) {
           badge.remove();
         }
       });

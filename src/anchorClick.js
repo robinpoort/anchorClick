@@ -16,8 +16,8 @@
 
   return function anchorClick(options) {
     var config = Object.assign({
-      parent: 'data-anchor-parent',
-      link: 'data-anchor-click',
+      parent: 'data-anchor',
+      link: 'data-anchor-target',
       ignore: 'data-anchor-ignore',
       clickableClass: 'is-clickable',
       downUpTime: 200,
