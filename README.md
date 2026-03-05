@@ -18,11 +18,11 @@ Or include directly via a `<script>` tag:
 
 ## Usage
 
-Add `data-anchor` to any item and `data-anchor-target` to the anchor inside it, then call `anchorClick()`:
+Add `data-anchor` to any item and `data-anchor` to the anchor inside it, then call `anchorClick()`:
 
 ```html
-<div data-anchor>
-  <h2><a href="/page" data-anchor-target>Title</a></h2>
+<div data-anchor-target>
+  <h2><a href="/page" data-anchor>Title</a></h2>
   <p>Clicking anywhere on this item navigates to /page.</p>
 </div>
 
@@ -44,8 +44,8 @@ All options are optional. Defaults shown below:
 
 ```js
 const instance = anchorClick({
-  parent: 'data-anchor',   // attribute on the clickable item
-  link: 'data-anchor-target',      // attribute on the target anchor
+  parent: 'data-anchor-target',   // attribute on the clickable item
+  link: 'data-anchor',      // attribute on the target anchor
   ignore: 'data-anchor-ignore',   // attribute to exclude child elements
   clickableClass: 'is-clickable', // class added to clickable items
   downUpTime: 200,                // max ms between pointerdown/up to count as a click
@@ -93,7 +93,7 @@ If an item contains multiple links, use a named reference to specify which link 
 
 ```html
 <div data-anchor="primary">
-  <h2><a href="/page" data-anchor-target="primary">Title</a></h2>
+  <h2><a href="/page" data-anchor="primary">Title</a></h2>
   <a href="/other">Other link</a>
 </div>
 ```
@@ -103,8 +103,8 @@ If an item contains multiple links, use a named reference to specify which link 
 Add `data-anchor-ignore` to any element inside an item that should not trigger navigation:
 
 ```html
-<div data-anchor>
-  <a href="/page" data-anchor-target>Title</a>
+<div data-anchor-target>
+  <a href="/page" data-anchor>Title</a>
   <button data-anchor-ignore>Add to favourites</button>
 </div>
 ```
@@ -119,7 +119,7 @@ Buttons and anchor tags are always ignored automatically.
 - **Right-click** — ignored, so the browser context menu works as expected.
 - **Script in `<head>`** — safe to include before `<body>` exists; initialisation is deferred to `DOMContentLoaded`.
 - **Dynamic content** — items added to the DOM after page load are handled automatically via `MutationObserver`.
-- **Attribute changes** — adding or removing `data-anchor` or `data-anchor-target` on existing elements is detected automatically.
+- **Attribute changes** — adding or removing `data-anchor` or `data-anchor` on existing elements is detected automatically.
 
 ## License
 
