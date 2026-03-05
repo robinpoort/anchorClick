@@ -1,11 +1,13 @@
 {
   "name": "anchor-click",
   "version": "1.0.0",
-  "description": "Make entire card elements clickable by delegating clicks to an anchor link within",
+  "description": "Make entire item elements clickable by delegating clicks to an anchor link within",
   "main": "dist/anchorClick.js",
+  "types": "dist/anchorClick.d.ts",
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
@@ -17,10 +19,12 @@
   },
   "keywords": [
     "anchor",
-    "card",
     "click",
     "clickable",
-    "link"
+    "link",
+    "card",
+    "item",
+    "delegation"
   ],
   "author": "Robin Poort",
   "license": "MIT",

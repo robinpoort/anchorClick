@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC = path.join(__dirname, 'src', 'anchorClick.js');
+const SRC_TYPES = path.join(__dirname, 'src', 'anchorClick.d.ts');
 const DIST = path.join(__dirname, 'dist');
 
 async function build() {
@@ -16,6 +17,11 @@ async function build() {
   // Copy source to dist/
   fs.writeFileSync(path.join(DIST, 'anchorClick.js'), source);
   console.log(`dist/anchorClick.js: ${source.length} bytes`);
+
+  // Copy types to dist/
+  const types = fs.readFileSync(SRC_TYPES, 'utf8');
+  fs.writeFileSync(path.join(DIST, 'anchorClick.d.ts'), types);
+  console.log(`dist/anchorClick.d.ts: ${types.length} bytes`);
 
   // Minified build
   const minified = await minify(source, {
