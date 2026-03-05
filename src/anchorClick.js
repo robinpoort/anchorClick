@@ -90,7 +90,7 @@
         if (!event.isPrimary) {
           return;
         }
-        if (event.button !== undefined && event.button !== 0 && event.button !== 1) {
+        if (event.button !== 0 && event.button !== 1) {
           return;
         }
         down = Date.now();
@@ -112,16 +112,22 @@
           return;
         }
 
+        // If clicking directly on or inside the target link, let the browser handle it
+        if (event.target.closest('[' + linkAttr + ']')) {
+          return;
+        }
+
         var up = Date.now();
         var item = event.target.closest('[' + parentAttr + ']');
+
+        if (!item) {
+          return;
+        }
+
         var ignore;
         try {
           ignore = event.target.closest('[' + ignoreAttr + '], [href]:not([' + linkAttr + '])');
         } catch (e) {
-          return;
-        }
-
-        if (!item) {
           return;
         }
 
