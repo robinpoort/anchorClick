@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import vm from 'node:vm';
 import anchorClick from '../src/anchorClick.js';
 
 describe('anchorClick — default attributes', () => {
@@ -85,5 +88,42 @@ describe('anchorClick — custom attributes', () => {
     item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
 
     expect(onClick).toHaveBeenCalledWith(item, link);
+  });
+
+  it('removes pending DOMContentLoaded listener when destroyed before init', () => {
+    const bodyGetter = vi.spyOn(document, 'body', 'get').mockReturnValue(null);
+    const addSpy = vi.spyOn(document, 'addEventListener');
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+
+    instance = anchorClick();
+    instance.destroy();
+
+    const domReadyHandler = addSpy.mock.calls.find((call) => call[0] === 'DOMContentLoaded')?.[1];
+    expect(typeof domReadyHandler).toBe('function');
+    expect(removeSpy).toHaveBeenCalledWith('DOMContentLoaded', domReadyHandler);
+
+    bodyGetter.mockRestore();
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
+});
+
+describe('anchorClick — build and runtime safety', () => {
+  it('keeps dist/anchorClick.js in sync with src/anchorClick.js', () => {
+    const src = readFileSync(resolve('src/anchorClick.js'), 'utf8');
+    const dist = readFileSync(resolve('dist/anchorClick.js'), 'utf8');
+    expect(dist).toBe(src);
+  });
+
+  it('does not throw when evaluated without document (SSR/Node)', () => {
+    const source = readFileSync(resolve('src/anchorClick.js'), 'utf8');
+    const context = {
+      module: { exports: {} },
+      exports: {},
+      global: {}
+    };
+
+    expect(() => vm.runInNewContext(source, context)).not.toThrow();
+    expect(typeof context.module.exports).toBe('function');
   });
 });

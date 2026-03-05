@@ -18,7 +18,7 @@ Or include directly via a `<script>` tag:
 
 ## Usage
 
-Add `data-anchor` to any item and `data-anchor` to the anchor inside it, then call `anchorClick()`:
+Add `data-anchor-target` to any item and `data-anchor` to the anchor inside it, then call `anchorClick()`:
 
 ```html
 <div data-anchor-target>
@@ -81,7 +81,7 @@ anchorClick({
 If an item contains multiple links, use a named reference to specify which link should act as the primary click target:
 
 ```html
-<div data-anchor="primary">
+<div data-anchor-target="primary">
   <h2><a href="/page" data-anchor="primary">Title</a></h2>
   <a href="/other">Other link</a>
 </div>
@@ -108,7 +108,7 @@ Buttons and anchor tags are always ignored automatically.
 - **Right-click** — ignored, so the browser context menu works as expected.
 - **Script in `<head>`** — safe to include before `<body>` exists; initialisation is deferred to `DOMContentLoaded`.
 - **Dynamic content** — items added to the DOM after page load are handled automatically via `MutationObserver`.
-- **Attribute changes** — adding or removing `data-anchor` or `data-anchor` on existing elements is detected automatically.
+- **Attribute changes** — adding or removing `data-anchor-target` or `data-anchor` on existing elements is detected automatically.
 
 ## License
 

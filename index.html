@@ -143,8 +143,8 @@
         </div>
       </div>
       <div class="button-row">
-        <button onclick="addParentAttr()">Add <code>data-anchor</code></button>
-        <button onclick="removeParentAttr()">Remove <code>data-anchor</code></button>
+        <button onclick="addParentAttr()">Add <code>data-anchor-target</code></button>
+        <button onclick="removeParentAttr()">Remove <code>data-anchor-target</code></button>
       </div>
       <div class="button-row">
         <button onclick="addLinkAttr()">Add <code>data-anchor</code> to link</button>
@@ -260,13 +260,13 @@
     function addParentAttr() {
       const item = document.getElementById('attr-item');
       item.setAttribute('data-anchor-target', '');
-      log('Added data-anchor to #attr-item');
+      log('Added data-anchor-target to #attr-item');
     }
 
     function removeParentAttr() {
       const item = document.getElementById('attr-item');
       item.removeAttribute('data-anchor-target');
-      log('Removed data-anchor from #attr-item');
+      log('Removed data-anchor-target from #attr-item');
     }
 
     function addLinkAttr() {

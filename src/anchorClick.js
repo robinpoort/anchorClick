@@ -10,7 +10,7 @@
   }
 })(typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : this, function (window) {
 
-  if (!('querySelector' in document && 'addEventListener' in window)) {
+  if (!(typeof document !== 'undefined' && document && 'querySelector' in document && 'addEventListener' in window)) {
     return function () { return { destroy: function () {} }; };
   }
 
@@ -34,6 +34,9 @@
     var onPointerDown;
     var onPointerUp;
     var onPointerCancel;
+    var onDomReady;
+    var initialized = false;
+    var destroyed = false;
 
     function handleItem(item) {
       var link;
@@ -50,6 +53,11 @@
     }
 
     function init() {
+      if (initialized || destroyed) {
+        return;
+      }
+      initialized = true;
+
       document.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
         handleItem(item);
       });
@@ -173,13 +181,22 @@
     }
 
     if (!document.body) {
-      document.addEventListener('DOMContentLoaded', init, { once: true });
+      onDomReady = function () {
+        onDomReady = null;
+        init();
+      };
+      document.addEventListener('DOMContentLoaded', onDomReady, { once: true });
     } else {
       init();
     }
 
     return {
       destroy: function () {
+        destroyed = true;
+        if (onDomReady) {
+          document.removeEventListener('DOMContentLoaded', onDomReady);
+          onDomReady = null;
+        }
         if (observer) {
           observer.disconnect();
           observer = null;
