@@ -14,7 +14,11 @@ export default [
         window: 'readonly',
         document: 'readonly',
         MutationObserver: 'readonly',
-        Node: 'readonly'
+        Node: 'readonly',
+        define: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        global: 'readonly'
       }
     },
     rules: {

@@ -1,43 +1,57 @@
-if ('querySelector' in document && 'addEventListener' in window) {
-  /**
-   * Execute
-   */
-  (function () {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], function () {
+      return factory(root);
+    });
+  } else if (typeof exports === 'object') {
+    module.exports = factory(root);
+  } else {
+    root.anchorClick = factory(root);
+  }
+})(typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : this, function (window) {
 
-    // Cards
-    // =====
-    const cards = document.querySelectorAll('[data-card]');
-    const clickableClass = 'is-clickable-card';
-    let down;
-    let up;
-    const downUpTime = 200;
+  if (!('querySelector' in document && 'addEventListener' in window)) {
+    return function () {};
+  }
+
+  return function anchorClick(options) {
+    var config = Object.assign({
+      parent: 'data-anchor-parent',
+      link: 'data-anchor-click',
+      ignore: 'data-anchor-ignore',
+      clickableClass: 'is-clickable',
+      downUpTime: 200
+    }, options);
+
+    var parentAttr = config.parent;
+    var linkAttr = config.link;
+    var ignoreAttr = config.ignore;
+    var clickableClass = config.clickableClass;
+    var downUpTime = config.downUpTime;
+    var down;
+    var up;
 
     function handleCard(card) {
-      const link = card.querySelector('[data-card-link]');
+      var link = card.querySelector('[' + linkAttr + ']');
       if (link !== null) {
         card.classList.add(clickableClass);
       }
     }
 
-    cards.forEach((card) => {
+    document.querySelectorAll('[' + parentAttr + ']').forEach(function (card) {
       handleCard(card);
-    }, window);
+    });
 
-    // Observe changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((addedNode) => {
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (addedNode) {
           if (addedNode && addedNode.nodeType === Node.ELEMENT_NODE) {
-            const card = addedNode.hasAttribute('data-card') || false;
-            const cards = addedNode.querySelectorAll('[data-card]');
-            if (card) {
+            if (addedNode.hasAttribute(parentAttr)) {
               handleCard(addedNode);
             }
-            if (cards.length > 0) {
-              cards.forEach((card) => {
-                handleCard(card);
-              });
-            }
+            addedNode.querySelectorAll('[' + parentAttr + ']').forEach(function (card) {
+              handleCard(card);
+            });
           }
         });
       });
@@ -48,36 +62,40 @@ if ('querySelector' in document && 'addEventListener' in window) {
       subtree: true
     });
 
-    window.addEventListener('mousedown', () => {
+    window.addEventListener('mousedown', function () {
       down = Number(new Date());
     });
 
-    window.addEventListener('mouseup', (event) => {
+    window.addEventListener('mouseup', function (event) {
       if (event.target.hasAttribute('href') || event.target.tagName === 'BUTTON') {
-        return false;
+        return;
       }
 
       up = Number(new Date());
-      const card = event.target.closest('[data-card]');
-      const ignore = event.target.closest('[data-card-ignore], [href]:not([data-card-link])');
+      var card = event.target.closest('[' + parentAttr + ']');
+      var ignore = event.target.closest('[' + ignoreAttr + '], [href]:not([' + linkAttr + '])');
 
-      // Return if no card is found
       if (!card) {
-        return false;
+        return;
       }
 
-      let link = card.querySelector('[data-card-link]');
-      if (card.getAttribute('data-card').length > 0) {
-        link = card.querySelector(`[data-card-link="${card.getAttribute('data-card')}"]`);
+      var cardValue = card.getAttribute(parentAttr);
+      var link = cardValue && cardValue.length > 0
+        ? card.querySelector('[' + linkAttr + '="' + cardValue + '"]')
+        : card.querySelector('[' + linkAttr + ']');
+
+      if (!link) {
+        return;
       }
 
-      if (card && up - down < downUpTime && !ignore) {
-        if (event.ctrlKey && event.ctrlKey === true || event.which && event.which === 2) {
+      if (up - down < downUpTime && !ignore) {
+        if ((event.ctrlKey && event.ctrlKey === true) || (event.which && event.which === 2)) {
           window.open(link);
         } else {
           link.click();
         }
       }
     });
-  })();
-}
+  };
+
+});
