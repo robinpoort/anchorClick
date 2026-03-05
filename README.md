@@ -104,7 +104,7 @@ Buttons and anchor tags are always ignored automatically.
 
 - **Touch & pointer support** — uses `pointerdown`/`pointerup` so mouse, touch and stylus all work.
 - **Text selection** — clicking and dragging to select text does not trigger navigation (threshold: 200ms).
-- **Ctrl/Meta+click / middle-click** — opens the link in a new tab.
+- **Ctrl/Meta+click / middle-click** — opens the link in a new tab with `noopener,noreferrer`.
 - **Right-click** — ignored, so the browser context menu works as expected.
 - **Script in `<head>`** — safe to include before `<body>` exists; initialisation is deferred to `DOMContentLoaded`.
 - **Dynamic content** — items added to the DOM after page load are handled automatically via `MutationObserver`.

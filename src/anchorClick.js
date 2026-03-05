@@ -164,10 +164,11 @@
             config.onClick(item, link);
           }
           if (event.ctrlKey || event.metaKey || event.button === 1) {
-            window.open(link.href);
+            window.open(link.href, '_blank', 'noopener,noreferrer');
           } else {
             link.click();
           }
+          down = undefined;
         }
       };
 

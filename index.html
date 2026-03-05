@@ -153,7 +153,21 @@
     </section>
 
     <!-- ==============================
-         6. Destroy / re-init
+         6. onClick callback
+         ============================== -->
+    <section class="test-section">
+      <h2>onClick callback</h2>
+      <p>Pass an <code>onClick(item, link)</code> function to run custom logic on navigation — useful for analytics or state updates. This instance uses custom attribute names to avoid interfering with the main one.</p>
+      <div class="item-grid">
+        <div class="item item-named" data-callback-item>
+          <h3><a href="#callback-1" data-callback-link>Callback item</a></h3>
+          <p>Click this item — the <code>onClick</code> callback fires and logs below.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================
+         7. Destroy / re-init
          ============================== -->
     <section class="test-section">
       <h2>Destroy / re-init</h2>
@@ -171,14 +185,16 @@
   <script src="src/anchorClick.js"></script>
   <script>
     // Default init — returns an instance with destroy()
-    var instance = anchorClick({
+    var instance = anchorClick();
+
+    // Separate instance for the onClick callback demo (uses custom attribute names)
+    anchorClick({
+      parent: 'data-callback-item',
+      link: 'data-callback-link',
       onClick: function (item, link) {
-        log('onClick callback — item: ' + (item.id || item.className.split(' ')[0]) + ', href: ' + link.getAttribute('href'));
+        log('onClick: href=' + link.getAttribute('href'));
       }
     });
-
-    // Example for older projects using data-card:
-    // anchorClick({ parent: 'data-card', link: 'data-card-link', ignore: 'data-card-ignore', clickableClass: 'is-clickable-card' });
   </script>
   <script>
     // ==============================
@@ -245,11 +261,7 @@
     }
 
     function reinitInstance() {
-      instance = anchorClick({
-        onClick: function (item, link) {
-          log('onClick callback — item: ' + (item.id || item.className.split(' ')[0]) + ', href: ' + link.getAttribute('href'));
-        }
-      });
+      instance = anchorClick();
       log('anchorClick() re-initialised');
     }
 

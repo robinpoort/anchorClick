@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import vm from 'node:vm';
@@ -107,6 +107,339 @@ describe('anchorClick — custom attributes', () => {
     removeSpy.mockRestore();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Named links
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — named links', () => {
+  let instance;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+  });
+
+  it('navigates to the named link when parent has a matching value', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target="primary">
+        <a href="/primary" data-anchor="primary">Primary</a>
+        <a href="/secondary">Secondary</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+    const item = document.querySelector('[data-anchor-target]');
+    const link = document.querySelector('[data-anchor="primary"]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).toHaveBeenCalledWith(item, link);
+  });
+
+  it('does not navigate when clicking on a secondary link inside a named-link item', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target="primary">
+        <a href="/primary" data-anchor="primary">Primary</a>
+        <a href="/secondary" id="secondary-link">Secondary</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    document.getElementById('secondary-link').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Ignored elements
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — ignored elements', () => {
+  let instance;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+  });
+
+  it('does not navigate when clicking on a data-anchor-ignore element', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+        <span id="ignored" data-anchor-ignore>Ignored</span>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    document.getElementById('ignored').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate when clicking on an independent anchor tag', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+        <a href="/other" id="other-link">Other</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    document.getElementById('other-link').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate when clicking inside a button', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+        <button id="btn">Action</button>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    document.getElementById('btn').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// MutationObserver
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — MutationObserver', () => {
+  let instance;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+  });
+
+  it('adds clickable class to dynamically added items', async () => {
+    instance = anchorClick();
+
+    const item = document.createElement('div');
+    item.setAttribute('data-anchor-target', '');
+    item.innerHTML = '<a href="/test" data-anchor>Title</a>';
+    document.body.appendChild(item);
+
+    await new Promise(r => setTimeout(r, 0));
+
+    expect(item.classList.contains('is-clickable')).toBe(true);
+  });
+
+  it('removes clickable class when data-anchor-target is removed', async () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    instance = anchorClick();
+    const item = document.querySelector('[data-anchor-target]');
+    expect(item.classList.contains('is-clickable')).toBe(true);
+
+    item.removeAttribute('data-anchor-target');
+    await new Promise(r => setTimeout(r, 0));
+
+    expect(item.classList.contains('is-clickable')).toBe(false);
+  });
+
+  it('adds clickable class when data-anchor is added to a link', async () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" id="link">Title</a>
+      </div>
+    `;
+    instance = anchorClick();
+    const item = document.querySelector('[data-anchor-target]');
+    expect(item.classList.contains('is-clickable')).toBe(false);
+
+    document.getElementById('link').setAttribute('data-anchor', '');
+    await new Promise(r => setTimeout(r, 0));
+
+    expect(item.classList.contains('is-clickable')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Timing (downUpTime)
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — timing (downUpTime)', () => {
+  let instance;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('navigates when pointer is released within downUpTime', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick, downUpTime: 200 });
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    vi.advanceTimersByTime(100);
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).toHaveBeenCalled();
+  });
+
+  it('does not navigate when pointer is held longer than downUpTime', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick, downUpTime: 200 });
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    vi.advanceTimersByTime(250);
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate after pointercancel resets the press', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick, downUpTime: 200 });
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    window.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, isPrimary: true }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Modifier keys / new tab
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — modifier keys', () => {
+  let instance;
+  let openSpy;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+    openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+  });
+
+  afterEach(() => {
+    openSpy.mockRestore();
+  });
+
+  it('opens in new tab on ctrl+click', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    instance = anchorClick();
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true, button: 0, ctrlKey: true }));
+
+    expect(openSpy).toHaveBeenCalledWith(expect.any(String), '_blank', 'noopener,noreferrer');
+  });
+
+  it('opens in new tab on meta+click', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    instance = anchorClick();
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true, button: 0, metaKey: true }));
+
+    expect(openSpy).toHaveBeenCalledWith(expect.any(String), '_blank', 'noopener,noreferrer');
+  });
+
+  it('opens in new tab on middle-click', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    instance = anchorClick();
+    const item = document.querySelector('[data-anchor-target]');
+
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 1 }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true, button: 1 }));
+
+    expect(openSpy).toHaveBeenCalledWith(expect.any(String), '_blank', 'noopener,noreferrer');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Destroy
+// ---------------------------------------------------------------------------
+
+describe('anchorClick — destroy', () => {
+  let instance;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    if (instance) instance.destroy();
+  });
+
+  it('stops navigating after destroy is called', () => {
+    document.body.innerHTML = `
+      <div data-anchor-target>
+        <a href="/test" data-anchor>Title</a>
+      </div>
+    `;
+    const onClick = vi.fn();
+    instance = anchorClick({ onClick });
+    instance.destroy();
+
+    const item = document.querySelector('[data-anchor-target]');
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true }));
+    item.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Build and runtime safety
+// ---------------------------------------------------------------------------
 
 describe('anchorClick — build and runtime safety', () => {
   it('keeps dist/anchorClick.js in sync with src/anchorClick.js', () => {
