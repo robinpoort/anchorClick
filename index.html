@@ -180,7 +180,12 @@
 
   </main>
 
-  <div id="log" class="log-float"></div>
+  <div id="log" class="log-float">
+    <div class="log-toolbar">
+      <button id="log-clear-btn">Clear</button>
+    </div>
+    <div id="log-entries" class="log-entries"></div>
+  </div>
 
   <script src="src/anchorClick.js"></script>
   <script>
@@ -202,14 +207,20 @@
     // ==============================
 
     const logEl = document.getElementById('log');
+    const logEntries = document.getElementById('log-entries');
+
+    document.getElementById('log-clear-btn').addEventListener('click', function () {
+      logEntries.innerHTML = '';
+      logEl.classList.remove('is-visible');
+    });
 
     function log(msg) {
       logEl.classList.add('is-visible');
       const entry = document.createElement('div');
       entry.className = 'log-entry';
       entry.textContent = msg;
-      logEl.append(entry);
-      logEl.scrollTop = logEl.scrollHeight;
+      logEntries.append(entry);
+      logEntries.scrollTop = logEntries.scrollHeight;
     }
 
     // Intercept anchor clicks so the page doesn't actually navigate
