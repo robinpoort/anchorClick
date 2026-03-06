@@ -15,7 +15,7 @@
   }
 
   return function anchorClick(options) {
-    var config = Object.assign({
+    const config = Object.assign({
       parent: 'data-anchor-target',
       link: 'data-anchor',
       ignore: 'data-anchor-ignore',
@@ -24,24 +24,24 @@
       onClick: null
     }, options);
 
-    var parentAttr = config.parent;
-    var linkAttr = config.link;
-    var ignoreAttr = config.ignore;
-    var clickableClass = config.clickableClass;
-    var downUpTime = config.downUpTime;
-    var down;
-    var observer;
-    var onPointerDown;
-    var onPointerUp;
-    var onPointerCancel;
-    var onDomReady;
-    var initialized = false;
-    var destroyed = false;
+    const parentAttr = config.parent;
+    const linkAttr = config.link;
+    const ignoreAttr = config.ignore;
+    const clickableClass = config.clickableClass;
+    const downUpTime = config.downUpTime;
+    let down;
+    let observer;
+    let onPointerDown;
+    let onPointerUp;
+    let onPointerCancel;
+    let onDomReady;
+    let initialized = false;
+    let destroyed = false;
 
     function handleItem(item) {
-      var link;
+      let link;
       try {
-        link = item.querySelector('[' + linkAttr + ']');
+        link = item.querySelector(`[${linkAttr}]`);
       } catch (e) {
         return;
       }
@@ -58,25 +58,25 @@
       }
       initialized = true;
 
-      document.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
+      document.querySelectorAll(`[${parentAttr}]`).forEach((item) => {
         handleItem(item);
       });
 
-      observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
+      observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
           if (mutation.type === 'childList') {
-            mutation.addedNodes.forEach(function (addedNode) {
+            mutation.addedNodes.forEach((addedNode) => {
               if (addedNode && addedNode.nodeType === Node.ELEMENT_NODE) {
                 if (addedNode.hasAttribute(parentAttr)) {
                   handleItem(addedNode);
                 }
-                addedNode.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
+                addedNode.querySelectorAll(`[${parentAttr}]`).forEach((item) => {
                   handleItem(item);
                 });
               }
             });
           } else if (mutation.type === 'attributes') {
-            var target = mutation.target;
+            const target = mutation.target;
             if (mutation.attributeName === parentAttr) {
               if (target.hasAttribute(parentAttr)) {
                 handleItem(target);
@@ -84,7 +84,7 @@
                 target.classList.remove(clickableClass);
               }
             } else if (mutation.attributeName === linkAttr) {
-              var parent = target.closest('[' + parentAttr + ']');
+              const parent = target.closest(`[${parentAttr}]`);
               if (parent) {
                 handleItem(parent);
               }
@@ -100,7 +100,7 @@
         attributeFilter: [parentAttr, linkAttr]
       });
 
-      onPointerDown = function (event) {
+      onPointerDown = (event) => {
         if (!event.isPrimary) {
           return;
         }
@@ -110,7 +110,7 @@
         down = Date.now();
       };
 
-      onPointerUp = function (event) {
+      onPointerUp = (event) => {
         // Ignore non-primary pointers (multi-touch)
         if (!event.isPrimary) {
           return;
@@ -127,30 +127,30 @@
         }
 
         // If clicking directly on or inside the target link, let the browser handle it
-        if (event.target.closest('[' + linkAttr + ']')) {
+        if (event.target.closest(`[${linkAttr}]`)) {
           return;
         }
 
-        var up = Date.now();
-        var item = event.target.closest('[' + parentAttr + ']');
+        const up = Date.now();
+        const item = event.target.closest(`[${parentAttr}]`);
 
         if (!item) {
           return;
         }
 
-        var ignore;
+        let ignore;
         try {
-          ignore = event.target.closest('[' + ignoreAttr + '], [href]:not([' + linkAttr + '])');
+          ignore = event.target.closest(`[${ignoreAttr}], [href]:not([${linkAttr}])`);
         } catch (e) {
           return;
         }
 
-        var itemValue = item.getAttribute(parentAttr);
-        var link;
+        const itemValue = item.getAttribute(parentAttr);
+        let link;
         try {
           link = itemValue && itemValue.length > 0
-            ? item.querySelector('[' + linkAttr + '="' + itemValue + '"]')
-            : item.querySelector('[' + linkAttr + ']');
+            ? item.querySelector(`[${linkAttr}="${itemValue}"]`)
+            : item.querySelector(`[${linkAttr}]`);
         } catch (e) {
           return;
         }
@@ -172,7 +172,7 @@
         }
       };
 
-      onPointerCancel = function () {
+      onPointerCancel = () => {
         down = undefined;
       };
 
@@ -182,7 +182,7 @@
     }
 
     if (!document.body) {
-      onDomReady = function () {
+      onDomReady = () => {
         onDomReady = null;
         init();
       };
@@ -192,7 +192,7 @@
     }
 
     return {
-      destroy: function () {
+      destroy() {
         destroyed = true;
         if (onDomReady) {
           document.removeEventListener('DOMContentLoaded', onDomReady);
@@ -214,7 +214,7 @@
           window.removeEventListener('pointercancel', onPointerCancel);
           onPointerCancel = null;
         }
-        document.querySelectorAll('[' + parentAttr + ']').forEach(function (item) {
+        document.querySelectorAll(`[${parentAttr}]`).forEach((item) => {
           item.classList.remove(clickableClass);
         });
       }
